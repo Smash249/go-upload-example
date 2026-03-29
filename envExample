@@ -1,0 +1,9 @@
+SORA_APIKey=你的SORA_APIKey
+SORA_APIURL=你的SORA_APIURL
+MONGO_URI=你的MONGO_URI
+MONGO_DB=你的MONGO_DB
+
+AccessKeyID=你的阿里云AccessKeyID
+AccessKeySecret=你的阿里云AccessKeySecret
+Endpoint=你的阿里云Endpoint
+BucketName=你的阿里云BucketName
