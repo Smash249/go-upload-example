@@ -165,7 +165,7 @@ func (g *GenerateImageRequest) SaveLocal(data read.XlsxData, imageURL string) (s
 	}
 
 	ext := g.utils.getExtFromURL(imageURL)
-	timestamp := time.Now().UnixMilli()
+	timestamp := time.Now().UTC().UnixMilli()
 	safeName := g.utils.sanitizeFileName(data.BaseText)
 	fileName := fmt.Sprintf("%s_%d%s", safeName, timestamp, ext)
 	filePath := filepath.Join(savePath, fileName)
@@ -192,7 +192,7 @@ func (g *GenerateImageRequest) DownloadAndUploadAsWebp(data read.XlsxData, image
 	}
 	defer resp.Body.Close()
 
-	timestamp := time.Now().UnixMilli()
+	timestamp := time.Now().UTC().UnixMilli()
 	safeName := g.utils.sanitizeFileName(data.BaseText)
 	ext := ".webp"
 	objectKey := fmt.Sprintf("wordImages/%s_%d%s",
@@ -200,8 +200,7 @@ func (g *GenerateImageRequest) DownloadAndUploadAsWebp(data read.XlsxData, image
 		timestamp,
 		ext,
 	)
-
-	err = g.Oss.UploadAsWebp(objectKey, resp.Body, 80)
+	err = g.Oss.UploadAsWebp(objectKey, resp.Body, 60)
 	if err != nil {
 		return "", fmt.Errorf("压缩上传失败: %w", err)
 	}
@@ -217,7 +216,7 @@ func (g *GenerateImageRequest) DownloadAndUploadToOSS(data read.XlsxData, imageU
 	}
 	defer resp.Body.Close()
 	ext := g.utils.getExtFromURL(imageURL)
-	timestamp := time.Now().UnixMilli()
+	timestamp := time.Now().UTC().UnixMilli()
 	safeName := g.utils.sanitizeFileName(data.BaseText)
 	objectKey := fmt.Sprintf("wordImages/%d_%s%s",
 		timestamp,
@@ -238,7 +237,6 @@ func (g *GenerateImageRequest) GenerateImage(data read.XlsxData, ratio string, m
 	if err != nil {
 		return "", err
 	}
-
 	switch mode {
 	case SaveToOSS:
 		return g.DownloadAndUploadToOSS(data, imageURLs[0])
@@ -267,6 +265,7 @@ func (g *GenerateImageRequest) saveToDB(data read.XlsxData, imageURL string) err
 		PronText:            data.PronText,
 		DefinitionText:      data.DefinitionText,
 		LearnerExamplesText: data.LearnerExamples,
+		ChineseMeaning:      data.ChineseMeaning,
 		Image:               imageURL,
 		Sort:                0,
 		IsActive:            true,
@@ -293,6 +292,7 @@ func (g *GenerateImageRequest) handelExcute(data []read.XlsxData, mode SaveMode)
 		go func(workerID int) {
 			defer wg.Done()
 			for t := range taskCh {
+				time.Sleep(1 * time.Second)
 				fmt.Printf("[Worker %d] 开始处理: %s\n", workerID, t.Data.BaseText)
 				imageURL, err := g.GenerateImage(t.Data, t.Ratio, mode)
 				if err != nil {

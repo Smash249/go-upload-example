@@ -15,6 +15,7 @@ type Word struct {
 	PronText            string             `bson:"pronText" json:"pronText"`
 	DefinitionText      string             `bson:"definitionText" json:"definitionText"`
 	LearnerExamplesText string             `bson:"learnerExamplesText" json:"learnerExamplesText"`
+	ChineseMeaning      string             `bson:"chineseMeaning" json:"chineseMeaning"`
 	Image               string             `bson:"image" json:"image"`
 	Sort                int                `bson:"sort" json:"sort"`
 	IsActive            bool               `bson:"isActive" json:"isActive"`

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/xuri/excelize/v2"
 )
@@ -15,6 +16,7 @@ type XlsxData struct {
 	DefinitionText  string
 	LearnerExamples string
 	SeriesName      string
+	ChineseMeaning  string
 }
 
 type ResourceReader struct {
@@ -49,6 +51,12 @@ func (r *ResourceReader) OpenDirectory() ([]string, error) {
 		return nil, err
 	}
 	for _, file := range files {
+		if strings.HasPrefix(file, "~$") {
+			continue
+		}
+		if strings.ToLower(filepath.Ext(file)) != ".xlsx" {
+			continue
+		}
 		fileNames = append(fileNames, file)
 	}
 	return fileNames, nil
@@ -80,22 +88,21 @@ func (r *ResourceReader) OpenXlsxFile(filePath, seriresName string) ([]XlsxData,
 	}
 	result := make([]XlsxData, 0)
 
-	for idx, row := range rows {
-		if idx == 0 {
-			continue
-		}
-		base_text := r.getCell(row, 0)
-		pos_text := r.getCell(row, 1)
-		pron_text := r.getCell(row, 3)
-		definition_text := r.getCell(row, 4)
-		learnerexamples_text := r.getCell(row, 5)
+	for _, row := range rows {
+		baseText := r.getCell(row, 0)
+		posText := r.getCell(row, 1)
+		pronText := r.getCell(row, 3)
+		definitionText := r.getCell(row, 4)
+		learnerexamplesText := r.getCell(row, 5)
+		chineseMeaning := r.getCell(row, 6)
 		data := XlsxData{
 			SeriesName:      seriresName,
-			BaseText:        base_text,
-			PosText:         pos_text,
-			PronText:        pron_text,
-			DefinitionText:  definition_text,
-			LearnerExamples: learnerexamples_text,
+			BaseText:        baseText,
+			PosText:         posText,
+			PronText:        pronText,
+			DefinitionText:  definitionText,
+			LearnerExamples: learnerexamplesText,
+			ChineseMeaning:  chineseMeaning,
 		}
 		result = append(result, data)
 	}
