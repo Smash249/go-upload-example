@@ -7,6 +7,7 @@ import (
 	"time"
 	"upload/db/model"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -27,7 +28,7 @@ func NewCustomDB() (*CustomDB, error) {
 		URI:    os.Getenv("MONGO_URI"),
 		DBName: os.Getenv("MONGO_DB"),
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
 
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(config.URI))
@@ -57,6 +58,17 @@ func (c *CustomDB) InsertOne(collectionName string, document model.Word) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	_, err := collection.InsertOne(ctx, document)
+	return err
+}
+
+func (c *CustomDB) InsertOrUpdate(collectionName string, document model.Word) error {
+	collection := c.GetCollection(collectionName)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	filter := bson.M{"word": document}
+	update := bson.M{"$set": document}
+	opts := options.Update().SetUpsert(true)
+	_, err := collection.UpdateOne(ctx, filter, update, opts)
 	return err
 }
 

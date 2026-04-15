@@ -17,6 +17,7 @@ type Word struct {
 	LearnerExamplesText string             `bson:"learnerExamplesText" json:"learnerExamplesText"`
 	ChineseMeaning      string             `bson:"chineseMeaning" json:"chineseMeaning"`
 	Image               string             `bson:"image" json:"image"`
+	Audio               string             `bson:"audio" json:"audio"`
 	Sort                int                `bson:"sort" json:"sort"`
 	IsActive            bool               `bson:"isActive" json:"isActive"`
 	CreatedAt           time.Time          `bson:"createdAt" json:"createdAt"`

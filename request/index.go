@@ -257,7 +257,7 @@ func (g *GenerateImageRequest) saveToDB(data read.XlsxData, imageURL string) err
 		return fmt.Errorf("未找到系列ID，系列名称: %s", data.SeriesName)
 	}
 	seriesID, _ := primitive.ObjectIDFromHex(seriesKey)
-	return g.Db.InsertOne("words", model.Word{
+	return g.Db.InsertOrUpdate("words", model.Word{
 		CategoryID:          categoryID,
 		SeriesID:            seriesID,
 		BaseText:            data.BaseText,

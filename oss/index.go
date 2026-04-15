@@ -149,3 +149,15 @@ func (o *OSSClient) GetSignedURL(objectKey string, expireSeconds int64) (string,
 	}
 	return signedURL, nil
 }
+
+func (o *OSSClient) DeleteObject(objectKey string) error {
+	bucket, err := o.getBucket()
+	if err != nil {
+		return fmt.Errorf("获取 Bucket 失败: %w", err)
+	}
+	err = bucket.DeleteObject(objectKey)
+	if err != nil {
+		return fmt.Errorf("删除文件失败: %w", err)
+	}
+	return nil
+}
